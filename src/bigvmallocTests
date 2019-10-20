@@ -1,0 +1,192 @@
+/*Test suite for bigvmalloc
+ *
+ * arguments (number of small 10,000 int arrays) (size of huge int array)
+ * Ex:
+ * ./args 100 700000000
+ *
+ *   */
+
+#include <stdio.h>
+#include <string.h>
+#include <stdlib.h>
+#include "bigvmalloc.h"
+#include <unistd.h>
+
+void test2(int num)
+{
+    
+   printf("\n Small Array Test, allocate : %d number of arrays : 40 Kilo (4 bytes int) array \n", num);
+   
+    
+  printf("Preparing to allocate arrays\n");
+    
+    sleep(15);
+    
+    int *testint[num];
+    
+    
+ for(int ctr1=0;ctr1<num;ctr1++)
+    {
+     
+        printf("Allocating array ctr %d, ", ctr1);
+       char str[10];
+       sprintf(str, "my%d", ctr1);
+        testint[ctr1] = bigvmalloc(10*1000*sizeof(int),str );
+      
+        if(ctr1%10==0)
+            printf("\n");
+        
+     //  sleep(5);
+       
+        
+    }
+     printf("Arrays Allocated \n");
+  
+     printf("\nPreparing to write to  arrays\n");
+    
+    sleep(15);
+ 
+    for(int ctr1a=0;ctr1a<num;ctr1a++)
+    {
+     
+        int *tmpintarray = testint[ctr1a];
+        
+        for(int ctr1b=0;ctr1b<10*1000;ctr1b++)
+        {
+          
+            tmpintarray[ctr1b]=ctr1b*2;
+            
+            
+        }
+       
+        
+    }
+    
+     printf("Arrays Written to \n");
+    
+    printf("\nPreparing to deallocate arrays\n");
+    
+    sleep(15);
+
+    for(int ctr2=0;ctr2<num;ctr2++)
+    {
+        
+       printf("Freeing array ctr %d,  ", ctr2);
+       char str[10];
+       sprintf(str, "my%d", ctr2);
+       bigvmfree( testint[ctr2], str );
+       
+     //  sleep(5);
+        
+    }
+    
+     printf("\nCompleted  deallocate arrays\n");
+     sleep(15);
+
+}
+
+void test3(long size)
+{
+ 
+     printf("\n Huge Array Test, size : %ld (4 bytes int) array \n", size);
+ 
+    
+   printf("Preparing to allocate  array\n");
+   
+   sleep(15);
+  
+   
+   int *testarrayint =  bigvmalloc(size*sizeof(int),"testnew" );
+   
+    printf("Array Allocated\n");
+   
+   
+   sleep(15);
+   
+   printf("Preparing to Write to allocated array\n");
+ //  sleep(15);
+   
+   
+   for(long i = size/2;i<(size-10);i++)
+   {
+       testarrayint[i]=i*2;
+       
+       
+       
+   }
+   
+     printf("Array written to \n");
+   
+   sleep(5);
+   
+   printf("Preparing to Read from allocated array\n");
+   
+    sleep(5);
+  
+   for(long j = size/2;j<size-100;j++)
+   {
+      
+       if(j%1000==0)
+          printf("HugeArray[%ld]  : %d, ", j, testarrayint[j]);
+        
+       
+       
+       
+   }
+   
+   printf("\nPreparing to release array \n");
+ 
+   sleep(5);
+   
+  
+   bigvmfree(testarrayint, "testnew");
+ 
+    
+   printf("\nArray released \n");
+ 
+   
+    sleep(5);
+   
+    
+}
+
+
+int main(int argc, char**argv) {
+    int i;
+
+    // Prints arguments
+    printf("Arguments:\n");
+    for (i = 0; i < argc; i++) {
+        printf("%i: %s\n", i, argv[i]);
+    }
+    
+   
+    printf("Preparing to run bigvmalloc tests \n");
+    printf("Ideally you should do this test while viewing htop to ensure Virtual memory is allocated correctly \n");
+   
+    printf("There is 15 secs of sleep between intervals so that you can follow the VM change \n");
+    
+    
+    bigvmsetroot("/tmp");
+    
+    char *mytest = bigvmalloc(10000, "mytestchar");
+    
+    sleep(5);
+    
+    
+    test2(atoi(argv[1]));
+    test3(atoi(argv[2]));
+    
+    
+     return 0;
+    
+     
+     
+    
+}
+
+
+
+
+
+
