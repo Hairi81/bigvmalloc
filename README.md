@@ -20,7 +20,7 @@ malloc calls that doesn't FIT IN RAM.
  * somename_processpid.mem
  * 
  * 
- * char *mychar = bigvmalloc(1024*1024*1024*sizeof(char), "somename");
+ * char *mychar = (char *) bigvmalloc(1024*1024*1024*sizeof(char), "somename");
  *
  * 
  * 
